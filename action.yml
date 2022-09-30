@@ -1,0 +1,5 @@
+name: 'Setup Terragrunt'
+description: 'Action to setup terragrunt'
+runs:
+  using: 'node16'
+  main: 'dist/main/index.js'
