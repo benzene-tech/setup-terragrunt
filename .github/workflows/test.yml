@@ -1,0 +1,73 @@
+name: Test Action
+
+on:
+  push:
+    branches:
+      - "master"
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    branches:
+      - "master"
+    paths-ignore:
+      - "**.md"
+
+concurrency: ${{ github.workflow }}
+
+jobs:
+  test1:
+    name: Latest version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup terragrunt
+        uses: ./
+
+      - name: Check terragrunt version
+        run: terragrunt -version
+
+  test2:
+    name: Specific version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup terragrunt
+        uses: ./
+        with:
+          version: 0.38.10
+
+      - name: Check terragrunt version
+        run: terragrunt -version
+
+  test3:
+    name: Specific version already installed
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup terragrunt
+        uses: ./
+        with:
+          version: 0.38.10
+
+      - name: Setup terragrunt
+        uses: ./
+        with:
+          version: 0.38.10
+
+      - name: Check terragrunt version
+        run: terragrunt -version

@@ -1,5 +1,17 @@
-name: 'Setup Terragrunt'
-description: 'Action to setup terragrunt'
+name: Setup Terragrunt
+description: Action to setup terragrunt
+inputs:
+  version:
+    description: Terragrunt version to install
+    required: false
+    default: ""
+  token:
+    description: Github token
+    required: false
+    default: ${{ github.token }}
+outputs:
+  version:
+    description: Installed Terragrunt version
 runs:
-  using: 'node16'
-  main: 'dist/main/index.js'
+  using: node16
+  main: dist/main/index.js
