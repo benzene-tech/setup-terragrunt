@@ -6,24 +6,21 @@ on:
       - "master"
     paths-ignore:
       - "**.md"
-  pull_request:
-    branches:
-      - "master"
-    paths-ignore:
-      - "**.md"
+      - ".gitignore"
 
-concurrency: ${{ github.workflow }}
+concurrency: ${{ github.ref }}
 
 jobs:
-  test1:
+  test-1:
     name: Latest version
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
+
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
 
       - name: Setup terragrunt
         uses: ./
@@ -31,15 +28,16 @@ jobs:
       - name: Check terragrunt version
         run: terragrunt -version
 
-  test2:
+  test-2:
     name: Specific version
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
+
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
 
       - name: Setup terragrunt
         uses: ./
@@ -49,15 +47,16 @@ jobs:
       - name: Check terragrunt version
         run: terragrunt -version
 
-  test3:
+  test-3:
     name: Specific version already installed
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
+
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
 
       - name: Setup terragrunt
         uses: ./
