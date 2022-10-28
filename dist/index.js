@@ -13559,7 +13559,7 @@ const core = __nccwpck_require__(1597)
 const github = __nccwpck_require__(566)
 const tc = __nccwpck_require__(9543)
 const exec = __nccwpck_require__(9804)
-const io = __nccwpck_require__(1402)
+const fs = __nccwpck_require__(7147)
 
 async function run() {
     const platform = {
@@ -13597,23 +13597,23 @@ async function run() {
 
     const suffix = process.platform === 'win32' ? '.exe' : ''
     const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${version}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${suffix}`)
-
     if (process.platform !== 'win32') {
         await exec.exec('chmod u+x', [pathToCLI], {
             silent: true
         })
+    } else {
+        fs.renameSync(pathToCLI, `${pathToCLI}${suffix}`)
     }
+    core.exportVariable('TERRAGRUNT_CLI', pathToCLI)
 
-    const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${suffix}`, 'Terragrunt', version)
+    const cachedPath = await tc.cacheFile(__nccwpck_require__.ab + "index1.js", `terragrunt`, 'Terragrunt', version)
     core.addPath(cachedPath)
-
-    await io.rmRF(pathToCLI)
 
     core.setOutput('version', version)
 }
 
 run().catch(error => {
-    core.setFailed(error.message)
+    core.setFailed(error)
 })
 
 })();

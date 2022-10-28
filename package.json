@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "ncc build index.js --license licenses.txt -o dist/main"
+    "build": "cd wrapper && npm run build && cd .. && ncc build index.js --license licenses.txt",
+    "postinstall": "cd wrapper && npm install"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,6 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^5.1.1",
-    "@actions/io": "^1.1.2",
     "@actions/tool-cache": "^2.0.1"
   }
 }

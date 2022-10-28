@@ -2,7 +2,7 @@ const core = require('@actions/core')
 const github = require('@actions/github')
 const tc = require('@actions/tool-cache')
 const exec = require('@actions/exec')
-const io = require('@actions/io')
+const fs = require("fs")
 
 async function run() {
     const platform = {
@@ -40,21 +40,21 @@ async function run() {
 
     const suffix = process.platform === 'win32' ? '.exe' : ''
     const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${version}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${suffix}`)
-
     if (process.platform !== 'win32') {
         await exec.exec('chmod u+x', [pathToCLI], {
             silent: true
         })
+    } else {
+        fs.renameSync(pathToCLI, `${pathToCLI}${suffix}`)
     }
+    core.exportVariable('TERRAGRUNT_CLI', pathToCLI)
 
-    const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${suffix}`, 'Terragrunt', version)
+    const cachedPath = await tc.cacheFile(`${__dirname}/wrapper/dist/index.js`, `terragrunt`, 'Terragrunt', version)
     core.addPath(cachedPath)
-
-    await io.rmRF(pathToCLI)
 
     core.setOutput('version', version)
 }
 
 run().catch(error => {
-    core.setFailed(error.message)
+    core.setFailed(error)
 })
