@@ -19,9 +19,9 @@ async function run() {
     }
     const exitCode = await exec.exec(process.env.TERRAGRUNT_CLI, args, options)
 
-    core.setOutput('stdout', stdout.contents)
-    core.setOutput('stderr', stderr.contents)
-    core.setOutput('exitcode', exitCode.toString(10))
+    core.setOutput(`stdout`, stdout.contents)
+    core.setOutput(`stderr`, stderr.contents)
+    core.setOutput(`exitcode`, exitCode.toString(10))
 
     if (exitCode !== 0) {
         throw new Error(stderr.contents)

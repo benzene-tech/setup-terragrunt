@@ -1,5 +1,6 @@
 name: Setup Terragrunt
 description: Action to setup terragrunt
+
 inputs:
   version:
     description: Terragrunt version to install
@@ -8,9 +9,15 @@ inputs:
     description: Github token
     required: false
     default: ${{ github.token }}
+  install_wrapper:
+    description: Flag to install Wrapper CLI
+    required: false
+    default: 'true'
+
 outputs:
   version:
     description: Installed Terragrunt version
+
 runs:
   using: node16
   main: dist/index.js

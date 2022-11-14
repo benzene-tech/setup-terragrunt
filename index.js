@@ -2,57 +2,77 @@ const core = require('@actions/core')
 const github = require('@actions/github')
 const tc = require('@actions/tool-cache')
 const exec = require('@actions/exec')
-const fs = require("fs")
+const io = require('@actions/io')
 
 async function run() {
     const platform = {
-        linux: 'linux',
-        darwin: 'darwin',
-        win32: 'windows'
+        linux: `linux`,
+        darwin: `darwin`,
+        win32: `windows`
     }
     const arch = {
-        x64: 'amd64',
-        arm64: 'arm64'
+        x64: `amd64`,
+        arm64: `arm64`
     }
 
-    const token = core.getInput('token')
+    const token = core.getInput(`token`)
+    const installWrapper = core.getBooleanInput(`install_wrapper`)
 
-    let version = core.getInput('version')
-    if (!version) {
-        const octokit = github.getOctokit(token)
+    const octokit = github.getOctokit(token)
 
-        version = await octokit.rest.repos.getLatestRelease({
-            owner: 'gruntwork-io',
-            repo: 'terragrunt'
+    let tag = core.getInput(`version`)
+    let version
+    if (!tag) {
+        const release = await octokit.rest.repos.getLatestRelease({
+            owner: `gruntwork-io`,
+            repo: `terragrunt`
         }).then(result => {
-            return result.data.tag_name
+            return {
+                tag: result.data.tag_name,
+                version: result.data.name
+            }
         })
+        tag = release.tag
+        version = release.version
     } else {
-        version = `v${version}`
+        tag = `v${tag}`
+        version = octokit.rest.repos.getReleaseByTag({
+            owner: `gruntwork-io`,
+            repo: `terragrunt`,
+            tag: tag
+        }).then(result => {
+            return result.data.name
+        })
     }
 
-    const terragruntPath = tc.find('Terragrunt', version)
-    if (terragruntPath !== '') {
-        core.notice(`terragrunt with ${version} already installed`)
+    const terragruntPath = tc.find(`Terragrunt`, tag)
+    if (terragruntPath !== ``) {
+        core.notice(`terragrunt with ${tag} already installed`)
         core.addPath(terragruntPath)
         return
     }
 
-    const suffix = process.platform === 'win32' ? '.exe' : ''
-    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${version}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${suffix}`)
-    if (process.platform !== 'win32') {
-        await exec.exec('chmod u+x', [pathToCLI], {
+    const suffix = process.platform === `win32` ? `.exe` : ``
+    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${suffix}`)
+    if (process.platform !== `win32`) {
+        await exec.exec(`chmod u+x`, [pathToCLI], {
             silent: true
         })
-    } else {
-        fs.renameSync(pathToCLI, `${pathToCLI}${suffix}`)
     }
-    core.exportVariable('TERRAGRUNT_CLI', pathToCLI)
 
-    const cachedPath = await tc.cacheFile(`${__dirname}/wrapper/dist/index.js`, `terragrunt`, 'Terragrunt', version)
+    const sourceFile = installWrapper ? `${__dirname}/wrapper/dist/index.js` : pathToCLI
+    const cachedPath = await tc.cacheFile(sourceFile, `terragrunt${suffix}`, `Terragrunt`, tag)
     core.addPath(cachedPath)
 
-    core.setOutput('version', version)
+    if (installWrapper) {
+        core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
+    } else {
+        await io.rmRF(pathToCLI)
+    }
+
+    core.setOutput(`version`, version)
+
+    core.info(`Installed Terragrunt version: ${version}`)
 }
 
 run().catch(error => {
