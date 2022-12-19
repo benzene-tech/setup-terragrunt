@@ -113,9 +113,6 @@ jobs:
     name: With wrapper
     runs-on: ${{ matrix.os }}
     needs: check-dist
-    defaults:
-      run:
-        shell: ${{ matrix.os == 'windows-latest' && 'cmd' || '' }}
     strategy:
       fail-fast: false
       matrix:
