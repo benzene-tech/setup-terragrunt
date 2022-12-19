@@ -61,7 +61,7 @@ async function run() {
     }
 
     const sourceFile = installWrapper ? `${__dirname}/wrapper/dist/index.js` : pathToCLI
-    const cachedPath = await tc.cacheFile(sourceFile, `terragrunt${suffix}`, `Terragrunt`, tag)
+    const cachedPath = await tc.cacheFile(sourceFile, `terragrunt`, `Terragrunt`, tag)
     core.addPath(cachedPath)
 
     if (installWrapper) {
