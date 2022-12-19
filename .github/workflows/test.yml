@@ -80,7 +80,7 @@ jobs:
           install_wrapper: false
 
       - name: Check terragrunt version
-        run: terragrunt -version
+        run: terragrunt -version | grep 0.38.10
 
   test-3:
     name: Specific version already installed without wrapper
@@ -107,7 +107,7 @@ jobs:
           install_wrapper: false
 
       - name: Check terragrunt version
-        run: terragrunt -version
+        run: terragrunt -version | grep 0.38.10
 
   test-4:
     name: With wrapper
