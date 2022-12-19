@@ -13,11 +13,10 @@ async function run() {
     }
 
     const args = process.argv.slice(2)
-    const options = {
+    const exitCode = await exec.exec(process.env.TERRAGRUNT_CLI, args, {
         listeners,
         ignoreReturnCode: true
-    }
-    const exitCode = await exec.exec(process.env.TERRAGRUNT_CLI, args, options)
+    })
 
     core.setOutput(`stdout`, stdout.contents)
     core.setOutput(`stderr`, stderr.contents)
