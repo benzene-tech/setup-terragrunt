@@ -13665,7 +13665,7 @@ async function run() {
         core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
     }
 
-    const wrapperPathSuffix = process.platform === `win32` ? `\\terragrunt.cmd` : `bin/terragrunt`
+    const wrapperPathSuffix = process.platform === `win32` ? `\\terragrunt.cmd` : `/bin/terragrunt`
     const sourceFile = installWrapper ? `${stdout.contents.trim()}${wrapperPathSuffix}` : pathToCLI
     const wrapperSuffix = process.platform === `win32` ? `.cmd` : ``
     const targetFile = installWrapper ? `terragrunt${wrapperSuffix}` : `terragrunt${cliSuffix}`
