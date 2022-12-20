@@ -61,6 +61,9 @@ async function run() {
         })
     }
 
+    const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${cliSuffix}`, `Terragrunt`, tag)
+    await io.rmRF(pathToCLI)
+
     const stdout = new Listener()
     const stderr = new Listener()
     const listeners = {
@@ -80,20 +83,10 @@ async function run() {
             throw new Error(stderr.contents)
         }
 
-        core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
+        core.exportVariable(`TERRAGRUNT_CLI`, core.toPlatformPath(`${cachedPath}/terragrunt${cliSuffix}`))
+    } else {
+        core.addPath(cachedPath)
     }
-
-    const wrapperPathSuffix = process.platform === `win32` ? `\\terragrunt` : `/bin/terragrunt`
-    const sourceFile = installWrapper ? `${stdout.contents.trim()}${wrapperPathSuffix}` : pathToCLI
-    const targetFile = installWrapper ? `terragrunt` : `terragrunt${cliSuffix}`
-    const cachedPath = await tc.cacheFile(sourceFile, targetFile, `Terragrunt`, tag)
-    if (process.platform === `win32` && installWrapper) {
-        await io.mv(`${stdout.contents.trim()}\\terragrunt.cmd`, cachedPath)
-        await io.mv(`${stdout.contents.trim()}\\terragrunt.ps1`, cachedPath)
-    }
-    core.addPath(cachedPath)
-
-    await io.rmRF(sourceFile)
 
     core.setOutput(`version`, version)
     core.setOutput(`path`, cachedPath)
