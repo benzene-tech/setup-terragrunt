@@ -82,7 +82,7 @@ async function run() {
         core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
     }
 
-    const sourceFile = installWrapper ? `${stdout.contents}/bin/terragrunt` : pathToCLI
+    const sourceFile = installWrapper ? `${stdout.contents.trim()}/bin/terragrunt` : pathToCLI
     const cachedPath = await tc.cacheFile(sourceFile, `terragrunt`, `Terragrunt`, tag)
     core.addPath(cachedPath)
 
