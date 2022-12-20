@@ -54,7 +54,6 @@ async function run() {
     }
 
     const cliSuffix = process.platform === `win32` ? `.exe` : ``
-    const wrapperSuffix = process.platform === `win32` ? `.cmd` : ``
     const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${cliSuffix}`)
     if (process.platform !== `win32`) {
         await exec.exec(`chmod u+x`, [pathToCLI], {
@@ -83,9 +82,11 @@ async function run() {
         core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
     }
 
-    const wrapperPathSuffix = process.platform === `win32` ? `terragrunt${wrapperSuffix}` : `bin/terragrunt`
-    const sourceFile = installWrapper ? core.toPlatformPath(`${stdout.contents.trim()}/${wrapperPathSuffix}`) : pathToCLI
-    const cachedPath = await tc.cacheFile(sourceFile, `terragrunt${wrapperSuffix}`, `Terragrunt`, tag)
+    const wrapperPathSuffix = process.platform === `win32` ? `\\terragrunt.cmd` : `bin/terragrunt`
+    const sourceFile = installWrapper ? `${stdout.contents.trim()}${wrapperPathSuffix}` : pathToCLI
+    const wrapperSuffix = process.platform === `win32` ? `.cmd` : ``
+    const targetFile = installWrapper ? `terragrunt${wrapperSuffix}` : `terragrunt${cliSuffix}`
+    const cachedPath = await tc.cacheFile(sourceFile, targetFile, `Terragrunt`, tag)
     core.addPath(cachedPath)
 
     if (!installWrapper) {
