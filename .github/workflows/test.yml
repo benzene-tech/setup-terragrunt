@@ -15,9 +15,6 @@ on:
       - ".gitignore"
 
 concurrency: ${{ github.ref }}
-defaults:
-  run:
-    shell: bash
 
 jobs:
   check-dist:
