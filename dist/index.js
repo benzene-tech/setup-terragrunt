@@ -1,6 +1,32 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 6839:
+/***/ ((module) => {
+
+class Listener {
+    constructor() {
+        this._buff = []
+    }
+
+    get listener() {
+        const listen = function listen(data) {
+            this._buff.push(data)
+        }
+
+        return listen.bind(this)
+    }
+
+    get contents() {
+        return this._buff.map(chunk => chunk.toString()).join(``)
+    }
+}
+
+module.exports = Listener
+
+
+/***/ }),
+
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -13362,14 +13388,6 @@ module.exports = eval("require")("encoding");
 
 /***/ }),
 
-/***/ 2503:
-/***/ ((module) => {
-
-module.exports = eval("require")("lib/listener");
-
-
-/***/ }),
-
 /***/ 9491:
 /***/ ((module) => {
 
@@ -13568,7 +13586,7 @@ const github = __nccwpck_require__(5438)
 const tc = __nccwpck_require__(7784)
 const exec = __nccwpck_require__(1514)
 const io = __nccwpck_require__(7436)
-const Listener = __nccwpck_require__(2503)
+const Listener = __nccwpck_require__(6839)
 
 async function run() {
     const platform = {

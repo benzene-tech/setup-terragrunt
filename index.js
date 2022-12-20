@@ -3,7 +3,7 @@ const github = require('@actions/github')
 const tc = require('@actions/tool-cache')
 const exec = require('@actions/exec')
 const io = require('@actions/io')
-const Listener = require('lib/listener')
+const Listener = require('./lib/listener')
 
 async function run() {
     const platform = {
