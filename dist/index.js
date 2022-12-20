@@ -13657,14 +13657,6 @@ async function run() {
         await exec.exec(`npm link`, [], {
             silent: true
         })
-        const exitCode = await exec.exec(`npm prefix`, [`-g`], {
-            listeners,
-            ignoreReturnCode: true,
-            silent: true
-        })
-        if (exitCode !== 0) {
-            throw new Error(stderr.contents)
-        }
 
         core.exportVariable(`TERRAGRUNT_CLI`, core.toPlatformPath(`${cachedPath}/terragrunt${cliSuffix}`))
     } else {

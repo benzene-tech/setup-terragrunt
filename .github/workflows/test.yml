@@ -128,8 +128,16 @@ jobs:
         id: version
         run: terragrunt -version
 
-      - name: Test output
+      - name: Test linux or mac output
+        if: runner.os != 'Windows'
         run: |
           if [ -z "${{ steps.version.outputs.stdout }}" ]; then
             exit 1
           fi
+
+      - name: Test windows output
+        if: runner.os == 'Windows'
+        run: |
+          if ( ${{ steps.version.outputs.stdout }}.length -gt 0 ) {
+            exit 1
+          }
