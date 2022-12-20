@@ -86,7 +86,9 @@ async function run() {
     const cachedPath = await tc.cacheFile(sourceFile, `terragrunt`, `Terragrunt`, tag)
     core.addPath(cachedPath)
 
-    await io.rmRF(pathToCLI)
+    if (!installWrapper) {
+        await io.rmRF(pathToCLI)
+    }
     core.setOutput(`version`, version)
     core.info(`Installed Terragrunt version: ${version}`)
 }
