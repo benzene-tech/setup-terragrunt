@@ -73,12 +73,12 @@ async function run() {
         })
         const exitCode = await exec.exec(`npm prefix`, [`-g`], {
             listeners,
-            ignoreReturnCode: true
+            ignoreReturnCode: true,
+            silent: true
         })
         if (exitCode !== 0) {
             throw new Error(stderr.contents)
         }
-        await exec.exec(`gci ${stdout.contents.trim()}`, [])
 
         core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
     }

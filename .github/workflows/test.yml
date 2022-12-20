@@ -124,6 +124,8 @@ jobs:
       - name: Setup terragrunt
         uses: ./
 
+      - run: gci C:\npm\prefix
+
       - name: Check terragrunt version
         id: version
         run: terragrunt -version
