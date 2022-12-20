@@ -3,6 +3,7 @@ const github = require('@actions/github')
 const tc = require('@actions/tool-cache')
 const exec = require('@actions/exec')
 const io = require('@actions/io')
+const Listener = require('lib/listener')
 
 async function run() {
     const platform = {
@@ -60,18 +61,33 @@ async function run() {
         })
     }
 
-    const sourceFile = installWrapper ? `${__dirname}/wrapper/dist/index.js` : pathToCLI
+    const stdout = new Listener()
+    const stderr = new Listener()
+    const listeners = {
+        stdout: stdout.listener,
+        stderr: stderr.listener
+    }
+    if (installWrapper) {
+        await exec.exec(`npm link`, [], {
+            silent: true
+        })
+        const exitCode = await exec.exec(`npm prefix`, [`-g`], {
+            listeners,
+            ignoreReturnCode: true
+        })
+        if (exitCode !== 0) {
+            throw new Error(stderr.contents)
+        }
+
+        core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
+    }
+
+    const sourceFile = installWrapper ? `${stdout.contents}/bin/terragrunt` : pathToCLI
     const cachedPath = await tc.cacheFile(sourceFile, `terragrunt`, `Terragrunt`, tag)
     core.addPath(cachedPath)
 
-    if (installWrapper) {
-        core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
-    } else {
-        await io.rmRF(pathToCLI)
-    }
-
+    await io.rmRF(pathToCLI)
     core.setOutput(`version`, version)
-
     core.info(`Installed Terragrunt version: ${version}`)
 }
 

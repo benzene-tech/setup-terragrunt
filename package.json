@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd wrapper && npm run build && cd .. && ncc build index.js --license licenses.txt",
-    "postinstall": "cd wrapper && npm install"
+    "build": "ncc build index.js --license licenses.txt"
+  },
+  "bin": {
+    "terragrunt": "wrapper/terragrunt.js"
   },
   "repository": {
     "type": "git",
