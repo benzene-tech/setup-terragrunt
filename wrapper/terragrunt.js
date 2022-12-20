@@ -2,7 +2,7 @@
 
 const core = require('@actions/core')
 const exec = require('@actions/exec')
-const Listener = require('./lib/listener')
+const Listener = require('../lib/listener')
 
 async function run() {
     const stdout = new Listener()

@@ -8,6 +8,9 @@
     "build": "cd wrapper && npm run build && cd .. && ncc build index.js --license licenses.txt",
     "postinstall": "cd wrapper && npm install"
   },
+  "bin": {
+    "terragrunt": "wrapper/dist/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SanthoshNath/setup-terragrunt.git"

@@ -17,6 +17,8 @@ inputs:
 outputs:
   version:
     description: Installed Terragrunt version
+  path:
+    description: Path to Terragrunt CLI
 
 runs:
   using: node16

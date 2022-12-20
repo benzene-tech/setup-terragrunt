@@ -5,7 +5,7 @@ This action installs terragrunt CLI in runners.
 ## Usage
 
 ```yaml
-- uses: SanthoshNath/setup-terragrunt@v2
+- uses: SanthoshNath/setup-terragrunt@v3
   with:
     # Terragrunt version to be installed. Otherwise, installs latest version
     # For example, 0.38.10

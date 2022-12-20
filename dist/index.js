@@ -13609,25 +13609,29 @@ async function run() {
         return
     }
 
-    const suffix = process.platform === `win32` ? `.exe` : ``
-    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${suffix}`)
+    const cliSuffix = process.platform === `win32` ? `.exe` : ``
+    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${cliSuffix}`)
     if (process.platform !== `win32`) {
         await exec.exec(`chmod u+x`, [pathToCLI], {
             silent: true
         })
     }
 
-    const sourceFile = installWrapper ? __nccwpck_require__.ab + "index1.js" : pathToCLI
-    const cachedPath = await tc.cacheFile(sourceFile, `terragrunt${suffix}`, `Terragrunt`, tag)
-    core.addPath(cachedPath)
+    const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${cliSuffix}`, `Terragrunt`, tag)
+    await io.rmRF(pathToCLI)
 
     if (installWrapper) {
-        core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
+        await exec.exec(`npm link`, [], {
+            silent: true
+        })
+
+        core.exportVariable(`TERRAGRUNT_CLI`, core.toPlatformPath(`${cachedPath}/terragrunt${cliSuffix}`))
     } else {
-        await io.rmRF(pathToCLI)
+        core.addPath(cachedPath)
     }
 
     core.setOutput(`version`, version)
+    core.setOutput(`path`, cachedPath)
 
     core.info(`Installed Terragrunt version: ${version}`)
 }
