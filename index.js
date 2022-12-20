@@ -3,7 +3,6 @@ const github = require('@actions/github')
 const tc = require('@actions/tool-cache')
 const exec = require('@actions/exec')
 const io = require('@actions/io')
-const Listener = require('./lib/listener')
 
 async function run() {
     const platform = {
@@ -64,12 +63,6 @@ async function run() {
     const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${cliSuffix}`, `Terragrunt`, tag)
     await io.rmRF(pathToCLI)
 
-    const stdout = new Listener()
-    const stderr = new Listener()
-    const listeners = {
-        stdout: stdout.listener,
-        stderr: stderr.listener
-    }
     if (installWrapper) {
         await exec.exec(`npm link`, [], {
             silent: true
