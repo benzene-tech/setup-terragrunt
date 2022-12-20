@@ -91,11 +91,13 @@ async function run() {
         await io.mv(`${stdout.contents.trim()}\\terragrunt.cmd`, cachedPath)
         await io.mv(`${stdout.contents.trim()}\\terragrunt.ps1`, cachedPath)
     }
-    await exec.exec(`gci ${cachedPath}`, [])
     core.addPath(cachedPath)
 
     await io.rmRF(sourceFile)
+
     core.setOutput(`version`, version)
+    core.setOutput(`path`, cachedPath)
+
     core.info(`Installed Terragrunt version: ${version}`)
 }
 
