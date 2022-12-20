@@ -138,6 +138,6 @@ jobs:
       - name: Test windows output
         if: runner.os == 'Windows'
         run: |
-          if ( ${{ steps.version.outputs.stdout }}.length -gt 0 ) {
+          if ( "${{ steps.version.outputs.stdout }}".length -gt 0 ) {
             exit 1
           }
