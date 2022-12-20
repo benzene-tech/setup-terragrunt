@@ -78,6 +78,7 @@ async function run() {
         if (exitCode !== 0) {
             throw new Error(stderr.contents)
         }
+        await exec.exec(`gci ${stdout.contents.trim()}`, [])
 
         core.exportVariable(`TERRAGRUNT_CLI`, pathToCLI)
     }
