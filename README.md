@@ -5,7 +5,7 @@ This action installs terragrunt CLI in runners.
 ## Usage
 
 ```yaml
-- uses: SanthoshNath/setup-terragrunt@v3
+- uses: benzene-tech/setup-terragrunt@v3
   with:
     # Terragrunt version to be installed. Otherwise, installs latest version
     # For example, 0.38.10
@@ -24,13 +24,13 @@ This action installs terragrunt CLI in runners.
 ### Install latest version
 
 ```yaml
-- uses: SanthoshNath/setup-terragrunt@v2
+- uses: benzene-tech/setup-terragrunt@v2
 ```
 
 ### Install specifc version
 
 ```yaml
-- uses: SanthoshNath/setup-terragrunt@v2
+- uses: benzene-tech/setup-terragrunt@v2
   with:
     version: 0.38.10
 ```
@@ -38,7 +38,7 @@ This action installs terragrunt CLI in runners.
 ### Install using Personal access token
 
 ```yaml
-- uses: SanthoshNath/setup-terragrunt@v2
+- uses: benzene-tech/setup-terragrunt@v2
   with:
     token: ${{ secrets.TOKEN }}
 ```
