@@ -1,10 +1,12 @@
-class Listener {
+export class Listener {
+    private _buff: string[] ;
+
     constructor() {
         this._buff = []
     }
 
     get listener() {
-        const listen = function listen(data) {
+        const listen = (data: any) => {
             this._buff.push(data)
         }
 
@@ -15,5 +17,3 @@ class Listener {
         return this._buff.map(chunk => chunk.toString()).join(``)
     }
 }
-
-module.exports = Listener
