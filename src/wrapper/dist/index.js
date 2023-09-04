@@ -3954,32 +3954,6 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 892:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Listener = void 0;
-class Listener {
-    constructor() {
-        this._buff = [];
-    }
-    get listener() {
-        const listen = (data) => {
-            this._buff.push(data);
-        };
-        return listen.bind(this);
-    }
-    get contents() {
-        return this._buff.map(chunk => chunk.toString()).join(``);
-    }
-}
-exports.Listener = Listener;
-
-
-/***/ }),
-
 /***/ 855:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -4020,25 +3994,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec = __importStar(__nccwpck_require__(514));
-const listener_1 = __nccwpck_require__(892);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const stdout = new listener_1.Listener();
-        const stderr = new listener_1.Listener();
-        const listeners = {
-            stdout: stdout.listener,
-            stderr: stderr.listener
-        };
+        let stdout = '';
+        let stderr = '';
         const args = process.argv.slice(2);
         const exitCode = yield exec.exec(process.env.TERRAGRUNT_CLI, args, {
-            listeners,
+            listeners: {
+                stdout: (data) => {
+                    stdout += data.toString();
+                },
+                stderr: (data) => {
+                    stderr += data.toString();
+                }
+            },
             ignoreReturnCode: true
         });
-        core.setOutput(`stdout`, stdout.contents);
-        core.setOutput(`stderr`, stderr.contents);
+        core.setOutput(`stdout`, stdout);
+        core.setOutput(`stderr`, stderr);
         core.setOutput(`exitcode`, exitCode.toString(10));
         if (exitCode !== 0) {
-            throw new Error(stderr.contents);
+            throw new Error(stderr);
         }
     });
 }
