@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const core = require('@actions/core')
-const exec = require('@actions/exec')
-const Listener = require('../lib/listener')
+import core from "@actions/core";
+import exec from "@actions/exec";
+import {Listener} from "../lib/listener"
 
 async function run() {
     const stdout = new Listener()
@@ -13,7 +13,7 @@ async function run() {
     }
 
     const args = process.argv.slice(2)
-    const exitCode = await exec.exec(process.env.TERRAGRUNT_CLI, args, {
+    const exitCode = await exec.exec(process.env.TERRAGRUNT_CLI!, args, {
         listeners,
         ignoreReturnCode: true
     })

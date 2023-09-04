@@ -1,8 +1,8 @@
-const core = require('@actions/core')
-const github = require('@actions/github')
-const tc = require('@actions/tool-cache')
-const exec = require('@actions/exec')
-const io = require('@actions/io')
+import core from "@actions/core";
+import github from "@actions/github";
+import tc from "@actions/tool-cache";
+import exec from "@actions/exec";
+import io from "@actions/io";
 
 async function run() {
     const platform = {
@@ -53,7 +53,7 @@ async function run() {
     }
 
     const cliSuffix = process.platform === `win32` ? `.exe` : ``
-    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${cliSuffix}`)
+    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform as keyof Object]}_${arch[process.arch as keyof Object]}${cliSuffix}`)
     if (process.platform !== `win32`) {
         await exec.exec(`chmod u+x`, [pathToCLI], {
             silent: true

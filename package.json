@@ -2,11 +2,10 @@
   "name": "setup-terragrunt",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd wrapper && npm run build && cd .. && ncc build index.js --license licenses.txt",
-    "postinstall": "cd wrapper && npm install"
+    "build": "ncc build wrapper/terragrunt.ts --out wrapper/dist && ncc build index.ts"
   },
   "bin": {
     "terragrunt": "wrapper/dist/index.js"
@@ -30,6 +29,8 @@
     "@actions/tool-cache": "^2.0.1"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.36.1"
+    "@types/node": "^20.5.9",
+    "@vercel/ncc": "^0.36.1",
+    "typescript": "^5.2.2"
   }
 }
