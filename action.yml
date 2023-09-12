@@ -12,7 +12,7 @@ inputs:
   install_wrapper:
     description: Flag to install Wrapper CLI
     required: false
-    default: 'true'
+    default: 'false'
 
 outputs:
   version:

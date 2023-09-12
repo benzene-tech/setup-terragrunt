@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "ncc build src/wrapper/terragrunt.ts -o src/wrapper/dist && ncc build src/index.ts"
+    "package": "ncc build src/wrapper/terragrunt.ts -o src/wrapper/dist && ncc build src/index.ts"
   },
   "bin": {
     "terragrunt": "src/wrapper/dist/index.js"
