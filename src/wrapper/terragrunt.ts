@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-import * as core from "@actions/core";
-import * as exec from "@actions/exec";
+import * as core from "@actions/core"
+import * as exec from "@actions/exec"
+import {argv} from 'node:process'
 
 async function run() {
     let stdout = ``
     let stderr = ``
 
-    const args = process.argv.slice(2)
+    const args = argv.slice(2)
     const exitCode = await exec.exec(process.env.TERRAGRUNT_CLI!, args, {
         listeners: {
             stdout: (data: Buffer) => {

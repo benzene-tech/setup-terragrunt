@@ -13521,92 +13521,78 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const tc = __importStar(__nccwpck_require__(7784));
 const exec = __importStar(__nccwpck_require__(1514));
 const io = __importStar(__nccwpck_require__(7436));
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const platform = {
-            linux: `linux`,
-            darwin: `darwin`,
-            win32: `windows`
-        };
-        const arch = {
-            x64: `amd64`,
-            arm64: `arm64`
-        };
-        const token = core.getInput(`token`);
-        const installWrapper = core.getBooleanInput(`install_wrapper`);
-        const octokit = github.getOctokit(token);
-        let tag = core.getInput(`version`);
-        let version;
-        if (!tag) {
-            const release = yield octokit.rest.repos.getLatestRelease({
-                owner: `gruntwork-io`,
-                repo: `terragrunt`
-            }).then(result => {
-                return {
-                    tag: result.data.tag_name,
-                    version: result.data.name
-                };
-            });
-            tag = release.tag;
-            version = release.version;
-        }
-        else {
-            tag = `v${tag}`;
-            version = octokit.rest.repos.getReleaseByTag({
-                owner: `gruntwork-io`,
-                repo: `terragrunt`,
-                tag: tag
-            }).then(result => {
-                return result.data.name;
-            });
-        }
-        const terragruntPath = tc.find(`Terragrunt`, tag);
-        if (terragruntPath !== ``) {
-            core.notice(`terragrunt with ${tag} already installed`);
-            core.addPath(terragruntPath);
-            return;
-        }
-        const cliSuffix = process.platform === `win32` ? `.exe` : ``;
-        const pathToCLI = yield tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform]}_${arch[process.arch]}${cliSuffix}`);
-        if (process.platform !== `win32`) {
-            yield exec.exec(`chmod u+x`, [pathToCLI], {
-                silent: true
-            });
-        }
-        const cachedPath = yield tc.cacheFile(pathToCLI, `terragrunt${cliSuffix}`, `Terragrunt`, tag);
-        yield io.rmRF(pathToCLI);
-        if (installWrapper) {
-            yield exec.exec(`npm link`, [], {
-                silent: true
-            });
-            core.exportVariable(`TERRAGRUNT_CLI`, core.toPlatformPath(`${cachedPath}/terragrunt${cliSuffix}`));
-        }
-        else {
-            core.addPath(cachedPath);
-        }
-        core.setOutput(`version`, version);
-        core.setOutput(`path`, cachedPath);
-        core.info(`Installed Terragrunt version: ${version}`);
+const node_process_1 = __nccwpck_require__(7742);
+async function run() {
+    const token = core.getInput(`token`);
+    const octokit = github.getOctokit(token);
+    let tag = core.getInput(`version`);
+    let version;
+    if (!tag) {
+        const release = await octokit.rest.repos.getLatestRelease({
+            owner: `gruntwork-io`,
+            repo: `terragrunt`
+        });
+        tag = release.data.tag_name;
+        version = release.data.tag_name;
+    }
+    else {
+        tag = `v${tag}`;
+        const release = await octokit.rest.repos.getReleaseByTag({
+            owner: `gruntwork-io`,
+            repo: `terragrunt`,
+            tag: tag
+        });
+        version = release.data.tag_name;
+    }
+    const terragruntPath = tc.find(`Terragrunt`, tag);
+    if (terragruntPath !== ``) {
+        core.notice(`Terragrunt with ${tag} already installed`);
+        core.addPath(terragruntPath);
+        return;
+    }
+    const platform = {
+        linux: `linux`,
+        darwin: `darwin`,
+        win32: `windows`
+    };
+    const arch = {
+        x64: `amd64`,
+        arm64: `arm64`
+    };
+    const cliSuffix = node_process_1.platform === `win32` ? `.exe` : ``;
+    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[node_process_1.platform]}_${arch[node_process_1.arch]}${cliSuffix}`);
+    if (node_process_1.platform !== `win32`) {
+        await exec.exec(`chmod u+x`, [pathToCLI], {
+            silent: true
+        });
+    }
+    const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${cliSuffix}`, `Terragrunt`, tag);
+    await io.rmRF(pathToCLI);
+    const installWrapper = core.getBooleanInput(`install_wrapper`);
+    if (installWrapper) {
+        await exec.exec(`npm link`, [], {
+            silent: true
+        });
+        core.exportVariable(`TERRAGRUNT_CLI`, core.toPlatformPath(`${cachedPath}/terragrunt${cliSuffix}`));
+    }
+    else {
+        core.addPath(cachedPath);
+    }
+    core.setOutput(`version`, version);
+    core.setOutput(`path`, cachedPath);
+    core.info(`Installed Terragrunt version: ${version}`);
+}
+if (require.main === require.cache[eval('__filename')]) {
+    run().catch(error => {
+        core.setFailed(error);
     });
 }
-run().catch(error => {
-    core.setFailed(error);
-});
 
 
 /***/ }),
@@ -13680,6 +13666,14 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 7742:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:process");
 
 /***/ }),
 

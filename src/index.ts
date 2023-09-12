@@ -1,10 +1,40 @@
-import * as core from "@actions/core";
-import * as github from "@actions/github";
-import * as tc from "@actions/tool-cache";
-import * as exec from "@actions/exec";
-import * as io from "@actions/io";
+import * as core from "@actions/core"
+import * as github from "@actions/github"
+import * as tc from "@actions/tool-cache"
+import * as exec from "@actions/exec"
+import * as io from "@actions/io"
+import {arch as ARCH, platform as PLATFORM} from 'node:process'
 
 async function run() {
+    const token = core.getInput(`token`)
+    const octokit = github.getOctokit(token)
+
+    let tag: string = core.getInput(`version`)
+    let version: string
+    if (!tag) {
+        const release = await octokit.rest.repos.getLatestRelease({
+            owner: `gruntwork-io`,
+            repo: `terragrunt`
+        })
+        tag = release.data.tag_name
+        version = release.data.tag_name
+    } else {
+        tag = `v${tag}`
+        const release = await octokit.rest.repos.getReleaseByTag({
+            owner: `gruntwork-io`,
+            repo: `terragrunt`,
+            tag: tag
+        })
+        version = release.data.tag_name
+    }
+
+    const terragruntPath = tc.find(`Terragrunt`, tag)
+    if (terragruntPath !== ``) {
+        core.notice(`Terragrunt with ${tag} already installed`)
+        core.addPath(terragruntPath)
+        return
+    }
+
     const platform = {
         linux: `linux`,
         darwin: `darwin`,
@@ -14,47 +44,9 @@ async function run() {
         x64: `amd64`,
         arm64: `arm64`
     }
-
-    const token = core.getInput(`token`)
-    const installWrapper = core.getBooleanInput(`install_wrapper`)
-
-    const octokit = github.getOctokit(token)
-
-    let tag = core.getInput(`version`)
-    let version
-    if (!tag) {
-        const release = await octokit.rest.repos.getLatestRelease({
-            owner: `gruntwork-io`,
-            repo: `terragrunt`
-        }).then(result => {
-            return {
-                tag: result.data.tag_name,
-                version: result.data.name
-            }
-        })
-        tag = release.tag
-        version = release.version
-    } else {
-        tag = `v${tag}`
-        version = octokit.rest.repos.getReleaseByTag({
-            owner: `gruntwork-io`,
-            repo: `terragrunt`,
-            tag: tag
-        }).then(result => {
-            return result.data.name
-        })
-    }
-
-    const terragruntPath = tc.find(`Terragrunt`, tag)
-    if (terragruntPath !== ``) {
-        core.notice(`terragrunt with ${tag} already installed`)
-        core.addPath(terragruntPath)
-        return
-    }
-
-    const cliSuffix = process.platform === `win32` ? `.exe` : ``
-    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[process.platform as keyof Object]}_${arch[process.arch as keyof Object]}${cliSuffix}`)
-    if (process.platform !== `win32`) {
+    const cliSuffix = PLATFORM === `win32` ? `.exe` : ``
+    const pathToCLI = await tc.downloadTool(`https://github.com/gruntwork-io/terragrunt/releases/download/${tag}/terragrunt_${platform[PLATFORM as keyof Object]}_${arch[ARCH as keyof Object]}${cliSuffix}`)
+    if (PLATFORM !== `win32`) {
         await exec.exec(`chmod u+x`, [pathToCLI], {
             silent: true
         })
@@ -63,6 +55,7 @@ async function run() {
     const cachedPath = await tc.cacheFile(pathToCLI, `terragrunt${cliSuffix}`, `Terragrunt`, tag)
     await io.rmRF(pathToCLI)
 
+    const installWrapper = core.getBooleanInput(`install_wrapper`)
     if (installWrapper) {
         await exec.exec(`npm link`, [], {
             silent: true
@@ -79,6 +72,9 @@ async function run() {
     core.info(`Installed Terragrunt version: ${version}`)
 }
 
-run().catch(error => {
-    core.setFailed(error)
-})
+
+if (require.main === module) {
+    run().catch(error => {
+        core.setFailed(error)
+    })
+}
